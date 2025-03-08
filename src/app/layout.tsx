@@ -25,6 +25,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
+            <head>
+                <script
+                    defer
+                    src="https://analytics.okankoca.dev/script.js"
+                    data-website-id="13f06fb1-0302-4c08-a2cc-c92d9fec42f6"
+                ></script>
+            </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
