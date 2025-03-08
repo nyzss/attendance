@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "dahboard",
+    title: "dahbord ☝️🤓",
     description: "dashboard but working",
 };
 

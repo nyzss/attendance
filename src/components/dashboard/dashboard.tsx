@@ -16,17 +16,31 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface DashboardProps {
     data: Schema;
 }
 
 export function Dashboard({ data }: DashboardProps) {
+    const queryClient = useQueryClient();
     const yearlyData = useMemo(() => processAttendanceData(data), [data]);
 
     const [selectedYearIndex, setSelectedYearIndex] = useState(0);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Function to handle refresh
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await queryClient.invalidateQueries({ queryKey: ["attendance"] });
+        toast.success("Attendance data refreshed");
+        setIsRefreshing(false);
+    };
 
     // Set default year and month to current date on initial load
     useEffect(() => {
@@ -81,32 +95,49 @@ export function Dashboard({ data }: DashboardProps) {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Attendance Dashboard</h1>
 
-                    {/* Year Selector as a dropdown */}
-                    <Select
-                        value={selectedYearIndex.toString()}
-                        onValueChange={(value: string) => {
-                            const index = parseInt(value);
-                            setSelectedYearIndex(index);
-                            setSelectedMonthIndex(0);
-                            setSelectedDayIndex(0);
-                        }}
-                    >
-                        <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Select Year">
-                                {yearlyData[selectedYearIndex]?.year}
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {yearlyData.map((year, index) => (
-                                <SelectItem
-                                    key={year.year}
-                                    value={index.toString()}
-                                >
-                                    {year.year}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                        {/* Refresh Button */}
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleRefresh}
+                            disabled={isRefreshing}
+                            title="Refresh attendance data"
+                        >
+                            <RefreshCw
+                                className={`h-4 w-4 ${
+                                    isRefreshing ? "animate-spin" : ""
+                                }`}
+                            />
+                        </Button>
+
+                        {/* Year Selector as a dropdown */}
+                        <Select
+                            value={selectedYearIndex.toString()}
+                            onValueChange={(value: string) => {
+                                const index = parseInt(value);
+                                setSelectedYearIndex(index);
+                                setSelectedMonthIndex(0);
+                                setSelectedDayIndex(0);
+                            }}
+                        >
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Select Year">
+                                    {yearlyData[selectedYearIndex]?.year}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {yearlyData.map((year, index) => (
+                                    <SelectItem
+                                        key={year.year}
+                                        value={index.toString()}
+                                    >
+                                        {year.year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <p className="text-muted-foreground">
                     View your attendance hours and entries
