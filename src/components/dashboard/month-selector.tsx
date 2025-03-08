@@ -1,10 +1,16 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyAttendance } from "@/lib/dashboard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, parse } from "date-fns";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface MonthSelectorProps {
     months: MonthlyAttendance[];
@@ -41,6 +47,9 @@ export function MonthSelector({
         }
     };
 
+    // Determine if we should use buttons or dropdown based on number of months
+    const useDropdown = months.length > 3;
+
     return (
         <div className="flex items-center justify-between bg-card rounded-lg border p-2">
             <Button
@@ -52,20 +61,51 @@ export function MonthSelector({
                 <ChevronLeft className="h-4 w-4" />
             </Button>
 
-            <div className="flex gap-2">
-                {months.map((month, index) => (
-                    <Button
-                        key={month.monthKey}
-                        variant={
-                            selectedMonthIndex === index ? "default" : "ghost"
+            {useDropdown ? (
+                <div className="flex-1 px-2">
+                    <Select
+                        value={selectedMonthIndex.toString()}
+                        onValueChange={(value: string) =>
+                            onSelectMonth(parseInt(value))
                         }
-                        className="px-3"
-                        onClick={() => onSelectMonth(index)}
                     >
-                        {formatMonthDisplay(month.month)}
-                    </Button>
-                ))}
-            </div>
+                        <SelectTrigger className="w-full">
+                            <SelectValue>
+                                {formatMonthDisplay(
+                                    months[selectedMonthIndex]?.month || ""
+                                )}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {months.map((month, index) => (
+                                <SelectItem
+                                    key={month.monthKey}
+                                    value={index.toString()}
+                                >
+                                    {formatMonthDisplay(month.month)}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            ) : (
+                <div className="flex gap-2 justify-center flex-1">
+                    {months.map((month, index) => (
+                        <Button
+                            key={month.monthKey}
+                            variant={
+                                selectedMonthIndex === index
+                                    ? "default"
+                                    : "ghost"
+                            }
+                            className="px-3"
+                            onClick={() => onSelectMonth(index)}
+                        >
+                            {formatMonthDisplay(month.month)}
+                        </Button>
+                    ))}
+                </div>
+            )}
 
             <Button
                 variant="outline"

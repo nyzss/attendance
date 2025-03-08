@@ -10,6 +10,13 @@ import { YearSelector } from "./year-selector";
 import { MonthSelector } from "./month-selector";
 import { DaySelector } from "./day-selector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface DashboardProps {
     data: Schema;
@@ -53,16 +60,34 @@ export function Dashboard({ data }: DashboardProps) {
                 </p>
             </div>
 
-            {/* Year Selector */}
-            <YearSelector
-                years={yearlyData}
-                selectedYearIndex={selectedYearIndex}
-                onSelectYear={(index) => {
-                    setSelectedYearIndex(index);
-                    setSelectedMonthIndex(0);
-                    setSelectedDayIndex(0);
-                }}
-            />
+            {/* Year Selector as a dropdown */}
+            <div className="flex justify-end mb-2">
+                <Select
+                    value={selectedYearIndex.toString()}
+                    onValueChange={(value: string) => {
+                        const index = parseInt(value);
+                        setSelectedYearIndex(index);
+                        setSelectedMonthIndex(0);
+                        setSelectedDayIndex(0);
+                    }}
+                >
+                    <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Select Year">
+                            {yearlyData[selectedYearIndex]?.year}
+                        </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {yearlyData.map((year, index) => (
+                            <SelectItem
+                                key={year.year}
+                                value={index.toString()}
+                            >
+                                {year.year}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
 
             {/* Tabs for different views */}
             <Tabs

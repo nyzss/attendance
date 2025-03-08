@@ -42,6 +42,28 @@ export function DailyEntries({ dayData }: DailyEntriesProps) {
     // Calculate how much is missing to reach the goal
     const hoursToGoal = Math.max(0, dailyGoal - dayData.totalMergedHours);
 
+    // Get sources for merged entries
+    const getMergedEntrySources = (index: number) => {
+        // Find all raw entries that overlap with this merged entry
+        const mergedEntry = dayData.mergedEntries[index];
+        const sources = new Set<string>();
+
+        dayData.rawEntries.forEach((rawEntry) => {
+            // Check if this raw entry overlaps with the merged entry
+            const rawStart = rawEntry.begin.getTime();
+            const rawEnd = rawEntry.end.getTime();
+            const mergedStart = mergedEntry.begin.getTime();
+            const mergedEnd = mergedEntry.end.getTime();
+
+            // Check for overlap
+            if (rawStart <= mergedEnd && rawEnd >= mergedStart) {
+                sources.add(rawEntry.source);
+            }
+        });
+
+        return Array.from(sources);
+    };
+
     return (
         <Card className="w-full h-full">
             <CardHeader className="pb-2">
@@ -83,6 +105,7 @@ export function DailyEntries({ dayData }: DailyEntriesProps) {
                                     <TableRow>
                                         <TableHead>Start</TableHead>
                                         <TableHead>End</TableHead>
+                                        <TableHead>Sources</TableHead>
                                         <TableHead>Duration</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -104,6 +127,23 @@ export function DailyEntries({ dayData }: DailyEntriesProps) {
                                                         )}
                                                     </TableCell>
                                                     <TableCell>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {getMergedEntrySources(
+                                                                index
+                                                            ).map(
+                                                                (source, i) => (
+                                                                    <Badge
+                                                                        key={i}
+                                                                        variant="outline"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        {source}
+                                                                    </Badge>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
                                                         {formatDuration(
                                                             entry.durationHours
                                                         )}
@@ -114,7 +154,7 @@ export function DailyEntries({ dayData }: DailyEntriesProps) {
                                     ) : (
                                         <TableRow>
                                             <TableCell
-                                                colSpan={3}
+                                                colSpan={4}
                                                 className="text-center text-muted-foreground py-4"
                                             >
                                                 No merged entries for this day
