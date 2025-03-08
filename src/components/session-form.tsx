@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     sessionToken: z.string().min(1, {
@@ -49,7 +50,8 @@ export default function SessionForm() {
 
         setTimeout(() => {
             setIsSubmitting(false);
-            // router.push("/dashboard");
+            toast.success("Session token saved");
+            router.push("/dashboard");
         }, 1000);
     }
 
