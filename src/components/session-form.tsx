@@ -162,16 +162,16 @@ export default function SessionForm() {
                             </li>
                             <li>
                                 Open Chrome DevTools (right-click and select
-                                "Inspect" or press F12)
+                                &quot;Inspect&quot; or press F12)
                             </li>
-                            <li>Go to the "Application" tab</li>
+                            <li>Go to the &quot;Application&quot; tab</li>
                             <li>
-                                In the left sidebar, expand "Cookies" and select
-                                the 42 dashboard site
+                                In the left sidebar, expand &quot;Cookies&quot;
+                                and select the 42 dashboard site
                             </li>
                             <li>
-                                Find the cookie named "session" and copy its
-                                value
+                                Find the cookie named &quot;session&quot; and
+                                copy its value
                             </li>
                             <li>Paste the value in the form on the left</li>
                         </ol>

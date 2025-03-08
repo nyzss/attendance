@@ -17,7 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { CalendarIcon, Clock, ArrowUpDown } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";

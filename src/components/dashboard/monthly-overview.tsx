@@ -18,7 +18,6 @@ import {
     CartesianGrid,
     XAxis,
     YAxis,
-    Tooltip,
     ReferenceLine,
 } from "recharts";
 import {

@@ -19,7 +19,6 @@ import {
     XAxis,
     YAxis,
     ReferenceLine,
-    Legend,
 } from "recharts";
 import {
     ChartContainer,

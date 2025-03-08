@@ -1,4 +1,4 @@
-import { Schema, Entries } from "@/types/main";
+import { Schema } from "@/types/main";
 import { format, parseISO, differenceInMinutes, getYear } from "date-fns";
 
 export interface TimeEntry {

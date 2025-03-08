@@ -37,15 +37,14 @@ export function DaySelector({
         return dateMap;
     }, [days]);
 
-    // Get the month from the first day (assuming all days are from the same month)
-    const monthDate = days.length > 0 ? new Date(days[0].date) : new Date();
-
     // Get all days in the month
     const daysInMonth = useMemo(() => {
+        // Get the month from the first day (assuming all days are from the same month)
+        const monthDate = days.length > 0 ? new Date(days[0].date) : new Date();
         const start = startOfMonth(monthDate);
         const end = endOfMonth(monthDate);
         return eachDayOfInterval({ start, end });
-    }, [monthDate]);
+    }, [days]);
 
     // Get day names for the header
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

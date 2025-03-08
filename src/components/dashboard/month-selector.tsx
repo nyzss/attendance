@@ -42,7 +42,7 @@ export function MonthSelector({
             const date = parse(monthStr, "MMMM yyyy", new Date());
             // Format it as "Jan 2023"
             return format(date, "MMM yyyy");
-        } catch (e) {
+        } catch {
             return monthStr;
         }
     };
