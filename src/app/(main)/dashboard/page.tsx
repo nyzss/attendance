@@ -69,7 +69,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="container py-6 px-6 md:px-8 lg:px-12 mx-auto">
+        <div className="container py-6 px-4 md:px-6 lg:px-8 mx-auto">
             <Dashboard data={data} />
         </div>
     );

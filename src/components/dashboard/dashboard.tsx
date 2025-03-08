@@ -6,7 +6,6 @@ import { processAttendanceData } from "@/lib/dashboard";
 import { YearlyOverview } from "./yearly-overview";
 import { MonthlyOverview } from "./monthly-overview";
 import { DailyEntries } from "./daily-entries";
-import { MonthSelector } from "./month-selector";
 import { DaySelector } from "./day-selector";
 import { format } from "date-fns";
 import {
@@ -90,28 +89,21 @@ export function Dashboard({ data }: DashboardProps) {
     const selectedDay = daysArray[selectedDayIndex];
 
     return (
-        <div className="max-w-5xl w-full mx-auto space-y-6 px-4">
-            <div className="grid gap-2">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Attendance Dashboard</h1>
+        <div className="flex flex-col md:flex-row gap-6">
+            {/* Left sidebar with selectors */}
+            <div className="md:sticky md:top-6 md:self-start md:w-64 p-4 border rounded-lg bg-card shadow-sm">
+                <div className="space-y-6">
+                    {/* Dashboard Title */}
+                    <div>
+                        <h1 className="text-xl font-bold mb-1">Dashboard</h1>
+                        <p className="text-sm text-muted-foreground">
+                            View your attendance
+                        </p>
+                    </div>
 
-                    <div className="flex items-center gap-2">
-                        {/* Refresh Button */}
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            title="Refresh attendance data"
-                        >
-                            <RefreshCw
-                                className={`h-4 w-4 ${
-                                    isRefreshing ? "animate-spin" : ""
-                                }`}
-                            />
-                        </Button>
-
-                        {/* Year Selector as a dropdown */}
+                    {/* Year Selector */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Year</label>
                         <Select
                             value={selectedYearIndex.toString()}
                             onValueChange={(value: string) => {
@@ -121,7 +113,7 @@ export function Dashboard({ data }: DashboardProps) {
                                 setSelectedDayIndex(0);
                             }}
                         >
-                            <SelectTrigger className="w-[120px]">
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select Year">
                                     {yearlyData[selectedYearIndex]?.year}
                                 </SelectValue>
@@ -138,24 +130,61 @@ export function Dashboard({ data }: DashboardProps) {
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {/* Month Selector - Vertical List */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">Month</label>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRefresh}
+                                disabled={isRefreshing}
+                                title="Refresh attendance data"
+                                className="h-7 w-7"
+                            >
+                                <RefreshCw
+                                    className={`h-3.5 w-3.5 ${
+                                        isRefreshing ? "animate-spin" : ""
+                                    }`}
+                                />
+                            </Button>
+                        </div>
+                        <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                            {selectedYear.months.map((month, index) => (
+                                <button
+                                    key={month.monthKey}
+                                    onClick={() => {
+                                        setSelectedMonthIndex(index);
+                                        setSelectedDayIndex(0);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+                                        selectedMonthIndex === index
+                                            ? "bg-primary text-primary-foreground"
+                                            : "hover:bg-muted"
+                                    }`}
+                                >
+                                    {month.month}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-                <p className="text-muted-foreground">
-                    View your attendance hours and entries
-                </p>
             </div>
 
-            {/* Unified Dashboard View */}
-            <div className="space-y-6">
-                {/* Month Selector and Overview */}
+            {/* Main content area */}
+            <div className="flex-1 max-w-4xl space-y-6">
+                {/* Monthly Overview */}
                 <div className="space-y-4">
-                    <MonthSelector
-                        months={selectedYear.months}
-                        selectedMonthIndex={selectedMonthIndex}
-                        onSelectMonth={(index) => {
-                            setSelectedMonthIndex(index);
-                            setSelectedDayIndex(0);
-                        }}
-                    />
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">
+                            {selectedMonth.month}
+                        </h2>
+                        <div className="text-sm text-muted-foreground">
+                            Total: {selectedMonth.totalMergedHours.toFixed(1)}{" "}
+                            hours
+                        </div>
+                    </div>
                     <MonthlyOverview monthData={selectedMonth} />
                 </div>
 
