@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
     if (isPending) {
         return (
-            <div className="container py-6 px-4 md:px-6">
+            <div className="container py-6 px-6 md:px-8 lg:px-12 mx-auto">
                 <div className="max-w-6xl mx-auto space-y-6">
                     <div className="space-y-2">
                         <Skeleton className="h-8 w-[200px]" />
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
     if (isError || !data) {
         return (
-            <div className="container py-6 px-4 md:px-6">
+            <div className="container py-6 px-6 md:px-8 lg:px-12 mx-auto">
                 <div className="max-w-6xl mx-auto space-y-6">
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
@@ -55,7 +55,7 @@ export default function DashboardPage() {
 
     if (!data.attendance || data.attendance.length === 0) {
         return (
-            <div className="container py-6 px-4 md:px-6">
+            <div className="container py-6 px-6 md:px-8 lg:px-12 mx-auto">
                 <div className="max-w-6xl mx-auto flex flex-col items-center justify-center h-[50vh] space-y-4">
                     <h1 className="text-2xl font-bold">
                         No attendance data available
@@ -69,7 +69,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="container py-6 px-4 md:px-6">
+        <div className="container py-6 px-6 md:px-8 lg:px-12 mx-auto">
             <Dashboard data={data} />
         </div>
     );
