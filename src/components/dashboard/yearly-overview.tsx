@@ -124,8 +124,8 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                         content={
                             <ChartTooltipContent
                                 className="w-[180px]"
-                                formatter={(value) => [
-                                    <span className="font-bold">
+                                formatter={(value, name) => [
+                                    <span key={name} className="font-bold">
                                         Actual Hours:{" "}
                                     </span>,
                                     `${Math.round(Number(value))}h`,

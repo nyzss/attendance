@@ -180,11 +180,11 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                                     labelFormatter={(value) => {
                                         return `Date: ${value}`;
                                     }}
-                                    formatter={(value) => [
-                                        <span className="font-bold">
+                                    formatter={(value, name) => [
+                                        <span key={name} className="font-bold">
                                             Hours:{" "}
                                         </span>,
-                                        <span>
+                                        <span key={name}>
                                             {Math.round(Number(value))}h
                                         </span>,
                                     ]}

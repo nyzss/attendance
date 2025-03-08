@@ -1,12 +1,5 @@
 "use client";
 
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { DailyAttendance, formatDuration } from "@/lib/dashboard";
 import { format } from "date-fns";
 import {
