@@ -55,12 +55,6 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
     );
 
     // Determine status color based on progress
-    const getStatusColor = () => {
-        if (progressPercentage >= 100) return "text-green-500";
-        if (progressPercentage >= 75) return "text-yellow-500";
-        if (progressPercentage >= 50) return "text-orange-500";
-        return "text-red-500";
-    };
 
     return (
         <Card className="w-full">
@@ -80,9 +74,7 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                     </div>
                     <div className="text-right">
                         <div className="text-sm font-medium">Monthly Goal</div>
-                        <div
-                            className={`text-xl font-bold ${getStatusColor()}`}
-                        >
+                        <div className={`text-3xl font-bold`}>
                             {Math.round(progressPercentage)}%
                         </div>
                     </div>

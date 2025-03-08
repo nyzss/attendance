@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Schema } from "@/types/main";
 import { processAttendanceData } from "@/lib/dashboard";
 import { YearlyOverview } from "./yearly-overview";
@@ -8,6 +8,7 @@ import { MonthlyOverview } from "./monthly-overview";
 import { DailyEntries } from "./daily-entries";
 import { MonthSelector } from "./month-selector";
 import { DaySelector } from "./day-selector";
+import { format } from "date-fns";
 import {
     Select,
     SelectContent,
@@ -26,6 +27,32 @@ export function Dashboard({ data }: DashboardProps) {
     const [selectedYearIndex, setSelectedYearIndex] = useState(0);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
+    // Set default year and month to current date on initial load
+    useEffect(() => {
+        if (yearlyData.length > 0) {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonthKey = format(currentDate, "yyyy-MM");
+
+            // Find the index of the current year
+            const yearIndex = yearlyData.findIndex(
+                (year) => year.year === currentYear
+            );
+            if (yearIndex !== -1) {
+                setSelectedYearIndex(yearIndex);
+
+                // Find the index of the current month in this year
+                const year = yearlyData[yearIndex];
+                const monthIndex = year.months.findIndex(
+                    (month) => month.monthKey === currentMonthKey
+                );
+                if (monthIndex !== -1) {
+                    setSelectedMonthIndex(monthIndex);
+                }
+            }
+        }
+    }, [yearlyData]);
 
     // If no data, show a message
     if (yearlyData.length === 0) {

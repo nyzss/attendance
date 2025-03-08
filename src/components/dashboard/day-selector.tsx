@@ -71,7 +71,7 @@ export function DaySelector({
                 {dayNames.map((day) => (
                     <div
                         key={day}
-                        className="text-center text-sm font-medium text-muted-foreground"
+                        className="text-center text-xs font-medium text-muted-foreground"
                     >
                         {day}
                     </div>
