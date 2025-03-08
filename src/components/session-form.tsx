@@ -10,7 +10,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -25,6 +24,8 @@ import {
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useCookieState } from "ahooks";
+import { clientGetAttendance } from "@/lib/attendance";
 
 const formSchema = z.object({
     sessionToken: z.string().min(1, {
@@ -34,6 +35,8 @@ const formSchema = z.object({
 
 export default function SessionForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [, setCookie] = useCookieState("sessionToken");
+
     const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -43,16 +46,22 @@ export default function SessionForm() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
 
-        localStorage.setItem("sessionToken", values.sessionToken);
+        setCookie(values.sessionToken);
 
-        setTimeout(() => {
+        const attendance = await clientGetAttendance(values.sessionToken);
+
+        if (!attendance) {
+            toast.error("Invalid session token");
             setIsSubmitting(false);
-            toast.success("Session token saved");
-            router.push("/dashboard");
-        }, 1000);
+            return;
+        }
+
+        setIsSubmitting(false);
+        toast.success("Session token saved");
+        router.push("/dashboard");
     }
 
     return (

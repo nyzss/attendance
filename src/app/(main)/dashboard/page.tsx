@@ -2,20 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCookieState } from "ahooks";
 
 export default function DashboardPage() {
     const router = useRouter();
-    const [sessionToken, setSessionToken] = useState<string>();
+    const [sessionToken] = useCookieState("sessionToken");
 
     useEffect(() => {
-        const sessionToken = window.localStorage.getItem("sessionToken");
-
         if (!sessionToken) {
             router.push("/");
         }
-
-        setSessionToken(sessionToken ?? undefined);
-    }, []);
+    }, [sessionToken]);
 
     return (
         <div>

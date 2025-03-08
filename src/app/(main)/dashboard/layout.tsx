@@ -1,20 +1,17 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "sonner";
+export default async function Layout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("sessionToken")?.value;
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
-
-    useEffect(() => {
-        const sessionToken = window.localStorage.getItem("sessionToken");
-
-        if (!sessionToken) {
-            toast.error("No session token found");
-            router.push("/");
-        }
-    }, []);
+    if (!sessionToken) {
+        redirect("/");
+    }
 
     return <div>{children}</div>;
 }
