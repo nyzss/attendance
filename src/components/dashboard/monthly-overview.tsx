@@ -29,8 +29,10 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { CalendarIcon, Clock } from "lucide-react";
 
-// Monthly goal in hours
-const MONTHLY_GOAL = 140;
+// Monthly goal in hours (7 hours per day, 5 days a week, ~4 weeks per month)
+const DAILY_GOAL = 7;
+const WEEKLY_GOAL = DAILY_GOAL * 5;
+const MONTHLY_GOAL = WEEKLY_GOAL * 4; // Approximately 140 hours
 
 interface MonthlyOverviewProps {
     monthData: MonthlyAttendance;
@@ -96,7 +98,10 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                                     {formatDuration(monthData.totalMergedHours)}
                                 </span>
                             </div>
-                            <div>Goal: {MONTHLY_GOAL}h</div>
+                            <div>
+                                Goal: {MONTHLY_GOAL}h ({DAILY_GOAL}h/day, 5
+                                days/week)
+                            </div>
                         </div>
                         <Progress value={progressPercentage} className="h-2" />
                     </div>
@@ -144,11 +149,11 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                             />
                             <ChartTooltip content={<ChartTooltipContent />} />
                             <ReferenceLine
-                                y={MONTHLY_GOAL / 30} // Daily goal approximation
+                                y={DAILY_GOAL}
                                 stroke="rgba(255, 0, 0, 0.5)"
                                 strokeDasharray="3 3"
                                 label={{
-                                    value: "Daily Goal",
+                                    value: "Daily Goal (7h)",
                                     position: "insideTopRight",
                                 }}
                             />

@@ -1,10 +1,15 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DailyAttendance } from "@/lib/dashboard";
-import { Calendar } from "@/components/ui/calendar";
-import { format, parseISO } from "date-fns";
+import {
+    format,
+    startOfMonth,
+    endOfMonth,
+    eachDayOfInterval,
+    isSameDay,
+} from "date-fns";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 interface DaySelectorProps {
     days: DailyAttendance[];
@@ -35,24 +40,23 @@ export function DaySelector({
     // Get the month from the first day (assuming all days are from the same month)
     const monthDate = days.length > 0 ? new Date(days[0].date) : new Date();
 
+    // Get all days in the month
+    const daysInMonth = useMemo(() => {
+        const start = startOfMonth(monthDate);
+        const end = endOfMonth(monthDate);
+        return eachDayOfInterval({ start, end });
+    }, [monthDate]);
+
+    // Get day names for the header
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
     // Get the selected date
     const selectedDate = days[selectedDayIndex]?.date
         ? new Date(days[selectedDayIndex].date)
         : undefined;
 
-    // Custom day rendering to highlight days with data
-    const modifiers = useMemo(() => {
-        const hasData = days.map((day) => new Date(day.date));
-        return { hasData };
-    }, [days]);
-
-    const modifiersClassNames = {
-        hasData: "bg-primary/10 font-medium",
-    };
-
-    const handleSelect = (date: Date | undefined) => {
-        if (!date) return;
-
+    // Handle day selection
+    const handleSelectDay = (date: Date) => {
         const dateStr = format(date, "yyyy-MM-dd");
         const dayData = daysWithData.get(dateStr);
 
@@ -62,21 +66,62 @@ export function DaySelector({
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg">Select Day</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-6">
-                <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleSelect}
-                    className="rounded-md border"
-                    month={monthDate}
-                    modifiers={modifiers}
-                    modifiersClassNames={modifiersClassNames}
-                />
-            </CardContent>
-        </Card>
+        <div className="rounded-lg border bg-card p-4">
+            <div className="grid grid-cols-7 gap-1 mb-2">
+                {dayNames.map((day) => (
+                    <div
+                        key={day}
+                        className="text-center text-xs font-medium text-muted-foreground"
+                    >
+                        {day}
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+                {/* Add empty cells for days before the first day of the month */}
+                {Array.from({ length: daysInMonth[0].getDay() }).map((_, i) => (
+                    <div key={`empty-start-${i}`} className="h-10" />
+                ))}
+
+                {/* Render all days in the month */}
+                {daysInMonth.map((date) => {
+                    const dateStr = format(date, "yyyy-MM-dd");
+                    const dayData = daysWithData.get(dateStr);
+                    const isSelected =
+                        selectedDate && isSameDay(date, selectedDate);
+                    const hasHours = dayData && dayData.hours > 0;
+
+                    return (
+                        <button
+                            key={dateStr}
+                            className={cn(
+                                "h-10 w-full rounded-md flex items-center justify-center relative",
+                                isSelected &&
+                                    "bg-primary text-primary-foreground",
+                                !isSelected &&
+                                    hasHours &&
+                                    "bg-primary/10 hover:bg-primary/20",
+                                !isSelected && !hasHours && "hover:bg-muted"
+                            )}
+                            onClick={() => dayData && handleSelectDay(date)}
+                            disabled={!dayData}
+                        >
+                            <span>{date.getDate()}</span>
+                            {hasHours && !isSelected && (
+                                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
+                            )}
+                        </button>
+                    );
+                })}
+
+                {/* Add empty cells for days after the last day of the month */}
+                {Array.from({
+                    length: 6 - daysInMonth[daysInMonth.length - 1].getDay(),
+                }).map((_, i) => (
+                    <div key={`empty-end-${i}`} className="h-10" />
+                ))}
+            </div>
+        </div>
     );
 }

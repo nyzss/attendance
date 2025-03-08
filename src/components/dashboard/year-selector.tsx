@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { YearlyAttendance } from "@/lib/dashboard";
+import { Button } from "@/components/ui/button";
 
 interface YearSelectorProps {
     years: YearlyAttendance[];
@@ -16,24 +15,19 @@ export function YearSelector({
     onSelectYear,
 }: YearSelectorProps) {
     return (
-        <Card>
-            <CardContent className="p-4">
-                <div className="flex flex-wrap gap-2">
-                    {years.map((year, index) => (
-                        <Button
-                            key={year.year}
-                            variant={
-                                selectedYearIndex === index
-                                    ? "default"
-                                    : "outline"
-                            }
-                            onClick={() => onSelectYear(index)}
-                        >
-                            {year.year}
-                        </Button>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+        <div className="flex flex-wrap gap-2 bg-card rounded-lg border p-2">
+            {years.map((year, index) => (
+                <Button
+                    key={year.year}
+                    variant={
+                        selectedYearIndex === index ? "default" : "outline"
+                    }
+                    onClick={() => onSelectYear(index)}
+                    className="px-4"
+                >
+                    {year.year}
+                </Button>
+            ))}
+        </div>
     );
 }

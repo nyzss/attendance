@@ -1,10 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { MonthlyAttendance } from "@/lib/dashboard";
-import { DatePicker } from "@/components/ui/date-picker";
-import { format, parse, startOfMonth } from "date-fns";
-import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { format, parse } from "date-fns";
 
 interface MonthSelectorProps {
     months: MonthlyAttendance[];
@@ -17,49 +17,64 @@ export function MonthSelector({
     selectedMonthIndex,
     onSelectMonth,
 }: MonthSelectorProps) {
-    // Create a map of available months
-    const availableMonths = useMemo(() => {
-        const monthMap = new Map<string, number>();
+    const handlePrevious = () => {
+        if (selectedMonthIndex > 0) {
+            onSelectMonth(selectedMonthIndex - 1);
+        }
+    };
 
-        months.forEach((month, index) => {
-            monthMap.set(month.monthKey, index);
-        });
+    const handleNext = () => {
+        if (selectedMonthIndex < months.length - 1) {
+            onSelectMonth(selectedMonthIndex + 1);
+        }
+    };
 
-        return monthMap;
-    }, [months]);
-
-    // Get the selected month date
-    const selectedMonthDate = useMemo(() => {
-        if (months.length === 0 || selectedMonthIndex >= months.length)
-            return undefined;
-
-        const monthKey = months[selectedMonthIndex].monthKey; // Format: "yyyy-MM"
-        return startOfMonth(parse(monthKey, "yyyy-MM", new Date()));
-    }, [months, selectedMonthIndex]);
-
-    const handleSelectMonth = (date: Date | undefined) => {
-        if (!date) return;
-
-        const monthKey = format(date, "yyyy-MM");
-        const monthIndex = availableMonths.get(monthKey);
-
-        if (monthIndex !== undefined) {
-            onSelectMonth(monthIndex);
+    // Format the month name more nicely
+    const formatMonthDisplay = (monthStr: string) => {
+        try {
+            // Parse the month string (e.g., "January 2023")
+            const date = parse(monthStr, "MMMM yyyy", new Date());
+            // Format it as "Jan 2023"
+            return format(date, "MMM yyyy");
+        } catch (e) {
+            return monthStr;
         }
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg">Select Month</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <DatePicker
-                    date={selectedMonthDate}
-                    onSelect={handleSelectMonth}
-                    placeholder="Select a month"
-                />
-            </CardContent>
-        </Card>
+        <div className="flex items-center justify-between bg-card rounded-lg border p-2">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevious}
+                disabled={selectedMonthIndex === 0}
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="flex gap-2">
+                {months.map((month, index) => (
+                    <Button
+                        key={month.monthKey}
+                        variant={
+                            selectedMonthIndex === index ? "default" : "ghost"
+                        }
+                        className="px-3"
+                        onClick={() => onSelectMonth(index)}
+                    >
+                        {formatMonthDisplay(month.month)}
+                    </Button>
+                ))}
+            </div>
+
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNext}
+                disabled={selectedMonthIndex === months.length - 1}
+            >
+                <ChevronRight className="h-4 w-4" />
+            </Button>
+        </div>
     );
 }

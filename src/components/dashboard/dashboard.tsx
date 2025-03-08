@@ -9,6 +9,7 @@ import { DailyEntries } from "./daily-entries";
 import { YearSelector } from "./year-selector";
 import { MonthSelector } from "./month-selector";
 import { DaySelector } from "./day-selector";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface DashboardProps {
     data: Schema;
@@ -20,6 +21,7 @@ export function Dashboard({ data }: DashboardProps) {
     const [selectedYearIndex, setSelectedYearIndex] = useState(0);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+    const [activeTab, setActiveTab] = useState("yearly");
 
     // If no data, show a message
     if (yearlyData.length === 0) {
@@ -51,27 +53,36 @@ export function Dashboard({ data }: DashboardProps) {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Year Selector */}
-                <div className="md:col-span-3">
-                    <YearSelector
-                        years={yearlyData}
-                        selectedYearIndex={selectedYearIndex}
-                        onSelectYear={(index) => {
-                            setSelectedYearIndex(index);
-                            setSelectedMonthIndex(0);
-                            setSelectedDayIndex(0);
-                        }}
-                    />
-                </div>
+            {/* Year Selector */}
+            <YearSelector
+                years={yearlyData}
+                selectedYearIndex={selectedYearIndex}
+                onSelectYear={(index) => {
+                    setSelectedYearIndex(index);
+                    setSelectedMonthIndex(0);
+                    setSelectedDayIndex(0);
+                }}
+            />
 
-                {/* Yearly Overview */}
-                <div className="md:col-span-3">
+            {/* Tabs for different views */}
+            <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+            >
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="yearly">Yearly Overview</TabsTrigger>
+                    <TabsTrigger value="monthly">Monthly View</TabsTrigger>
+                    <TabsTrigger value="daily">Daily Details</TabsTrigger>
+                </TabsList>
+
+                {/* Yearly Overview Tab */}
+                <TabsContent value="yearly" className="mt-4 space-y-4">
                     <YearlyOverview yearData={selectedYear} />
-                </div>
+                </TabsContent>
 
-                {/* Month Selector */}
-                <div className="md:col-span-3">
+                {/* Monthly View Tab */}
+                <TabsContent value="monthly" className="mt-4 space-y-4">
                     <MonthSelector
                         months={selectedYear.months}
                         selectedMonthIndex={selectedMonthIndex}
@@ -80,29 +91,38 @@ export function Dashboard({ data }: DashboardProps) {
                             setSelectedDayIndex(0);
                         }}
                     />
-                </div>
-
-                {/* Monthly Overview */}
-                <div className="md:col-span-3">
                     <MonthlyOverview monthData={selectedMonth} />
-                </div>
+                </TabsContent>
 
-                {/* Day Selector */}
-                <div className="md:col-span-3">
-                    <DaySelector
-                        days={daysArray}
-                        selectedDayIndex={selectedDayIndex}
-                        onSelectDay={setSelectedDayIndex}
-                    />
-                </div>
+                {/* Daily Details Tab */}
+                <TabsContent value="daily" className="mt-4 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-1">
+                            <MonthSelector
+                                months={selectedYear.months}
+                                selectedMonthIndex={selectedMonthIndex}
+                                onSelectMonth={(index) => {
+                                    setSelectedMonthIndex(index);
+                                    setSelectedDayIndex(0);
+                                }}
+                            />
+                            <div className="mt-4">
+                                <DaySelector
+                                    days={daysArray}
+                                    selectedDayIndex={selectedDayIndex}
+                                    onSelectDay={setSelectedDayIndex}
+                                />
+                            </div>
+                        </div>
 
-                {/* Daily Entries */}
-                {selectedDay && (
-                    <div className="md:col-span-3">
-                        <DailyEntries dayData={selectedDay} />
+                        <div className="md:col-span-2">
+                            {selectedDay && (
+                                <DailyEntries dayData={selectedDay} />
+                            )}
+                        </div>
                     </div>
-                )}
-            </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }

@@ -30,8 +30,10 @@ import {
 } from "@/components/ui/chart";
 import { CalendarDays } from "lucide-react";
 
-// Monthly goal in hours
-const MONTHLY_GOAL = 140;
+// Monthly goal in hours (7 hours per day, 5 days a week, ~4 weeks per month)
+const DAILY_GOAL = 7;
+const WEEKLY_GOAL = DAILY_GOAL * 5;
+const MONTHLY_GOAL = WEEKLY_GOAL * 4; // Approximately 140 hours
 
 interface YearlyOverviewProps {
     yearData: YearlyAttendance;
@@ -51,7 +53,7 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
             color: "hsl(var(--chart-1))",
         },
         goal: {
-            label: "Goal (140h)",
+            label: `Goal (${MONTHLY_GOAL}h)`,
             color: "hsl(var(--chart-3))",
         },
         difference: {
@@ -115,7 +117,10 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                             y={MONTHLY_GOAL}
                             stroke="rgba(255, 0, 0, 0.5)"
                             strokeDasharray="3 3"
-                            label={{ value: "140h Goal", position: "right" }}
+                            label={{
+                                value: `${MONTHLY_GOAL}h Goal`,
+                                position: "right",
+                            }}
                         />
                         <Bar
                             dataKey="hours"
