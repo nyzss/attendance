@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +21,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { AlertCircle } from "lucide-react";
+import { CheckCircle, AlertTriangle, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCookieState } from "ahooks";
@@ -35,7 +35,9 @@ const formSchema = z.object({
 
 export default function SessionForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [, setCookie] = useCookieState("sessionToken");
+    const [sessionToken, setCookie] = useCookieState("sessionToken");
+    const [isCheckingToken, setIsCheckingToken] = useState(false);
+    const [isTokenValid, setIsTokenValid] = useState(false);
 
     const router = useRouter();
 
@@ -45,6 +47,22 @@ export default function SessionForm() {
             sessionToken: "",
         },
     });
+
+    // Check if existing token is valid
+    useEffect(() => {
+        async function checkExistingToken() {
+            if (sessionToken) {
+                setIsCheckingToken(true);
+                const attendance = await clientGetAttendance(
+                    String(sessionToken)
+                );
+                setIsTokenValid(!!attendance);
+                setIsCheckingToken(false);
+            }
+        }
+
+        checkExistingToken();
+    }, [sessionToken]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
@@ -64,8 +82,72 @@ export default function SessionForm() {
         router.push("/dashboard");
     }
 
+    function handleClearToken() {
+        setCookie("");
+        setIsTokenValid(false);
+        toast.success("Session token cleared");
+    }
+
+    function handleUseExistingToken() {
+        router.push("/dashboard");
+    }
+
     return (
         <div className="w-full">
+            {/* Banner for existing token */}
+            {sessionToken && (
+                <Card className="w-full mb-6 border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+                    <CardContent className="pt-6">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <h3 className="text-lg font-semibold">
+                                    {isCheckingToken ? (
+                                        <span className="flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Checking existing session...
+                                        </span>
+                                    ) : isTokenValid ? (
+                                        <span className="flex items-center gap-2 text-green-600">
+                                            <CheckCircle className="h-5 w-5" />
+                                            Valid session token found
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center gap-2 text-amber-600">
+                                            <AlertTriangle className="h-5 w-5" />
+                                            Existing session token may be
+                                            invalid
+                                        </span>
+                                    )}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    {isTokenValid
+                                        ? "You already have a valid session token. Would you like to use it?"
+                                        : "You have an existing session token, but it might not be valid anymore."}
+                                </p>
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                {isTokenValid && (
+                                    <Button
+                                        variant="default"
+                                        onClick={handleUseExistingToken}
+                                        className="flex-1 md:flex-none"
+                                    >
+                                        Use Existing Token
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="outline"
+                                    onClick={handleClearToken}
+                                    className="flex-1 md:flex-none"
+                                >
+                                    Clear Token
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="w-full">
                     <CardHeader>

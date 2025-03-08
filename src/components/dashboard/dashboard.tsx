@@ -7,7 +7,7 @@ import { YearlyOverview } from "./yearly-overview";
 import { MonthlyOverview } from "./monthly-overview";
 import { DailyEntries } from "./daily-entries";
 import { DaySelector } from "./day-selector";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
     Select,
     SelectContent,
@@ -19,6 +19,13 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from "@/components/ui/card";
 
 interface DashboardProps {
     data: Schema;
@@ -115,133 +122,176 @@ export function Dashboard({ data }: DashboardProps) {
     const selectedDay = daysArray[selectedDayIndex];
 
     return (
-        <div className="flex flex-col md:flex-row gap-6">
-            {/* Left sidebar with selectors */}
-            <div className="md:sticky md:top-6 md:self-start md:w-64 p-4 border rounded-lg bg-card shadow-sm">
-                <div className="space-y-6">
-                    {/* Dashboard Title */}
-                    <div>
-                        <h1 className="text-xl font-bold mb-1">Dashboard</h1>
-                        <p className="text-sm text-muted-foreground">
-                            View your attendance
-                        </p>
-                    </div>
-
-                    {/* Year Selector */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Year</label>
-                        <Select
-                            value={selectedYearIndex.toString()}
-                            onValueChange={(value: string) => {
-                                const index = parseInt(value);
-                                setSelectedYearIndex(index);
-                                setSelectedMonthIndex(0);
-                                setSelectedDayIndex(0);
-                            }}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Year">
-                                    {yearlyData[selectedYearIndex]?.year}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {yearlyData.map((year, index) => (
-                                    <SelectItem
-                                        key={year.year}
-                                        value={index.toString()}
-                                    >
-                                        {year.year}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* Month Selector - Vertical List */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium">Month</label>
-                        </div>
-                        <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
-                            {selectedYear.months.map((month, index) => (
-                                <button
-                                    key={month.monthKey}
-                                    onClick={() => {
-                                        setSelectedMonthIndex(index);
-                                        setSelectedDayIndex(0);
-                                    }}
-                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                                        selectedMonthIndex === index
-                                            ? "bg-primary text-primary-foreground"
-                                            : "hover:bg-muted"
-                                    }`}
-                                >
-                                    {month.month}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Refresh Button - More Intuitive */}
-                    <Button
-                        variant="outline"
-                        className="w-full flex items-center justify-center gap-2"
-                        onClick={handleRefresh}
-                        disabled={isRefreshing}
-                    >
-                        <RefreshCw
-                            className={`h-4 w-4 ${
-                                isRefreshing ? "animate-spin" : ""
-                            }`}
-                        />
-                        <span>
-                            {isRefreshing ? "Refreshing..." : "Refresh Data"}
-                        </span>
-                    </Button>
-                </div>
+        <div className="flex flex-col gap-6">
+            {/* Month title at the very top */}
+            <div className="sticky top-3 z-10 py-2">
+                <h1 className="text-2xl font-bold">{selectedMonth.month}</h1>
             </div>
 
-            {/* Main content area */}
-            <div className="flex-1 max-w-4xl space-y-6">
-                {/* Monthly Overview */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold">
-                            {selectedMonth.month}
-                        </h2>
-                        <div className="text-sm text-muted-foreground">
-                            Total: {selectedMonth.totalMergedHours.toFixed(1)}{" "}
-                            hours
+            <div className="flex flex-col md:flex-row gap-6">
+                {/* Left sidebar with selectors */}
+                <div className="md:sticky md:top-14 md:self-start md:w-64 border rounded-lg bg-card shadow-sm">
+                    <div className="p-4 space-y-6">
+                        {/* Dashboard Title */}
+                        <div>
+                            <h2 className="text-xl font-bold mb-1">
+                                Dashboard
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                View your attendance
+                            </p>
                         </div>
-                    </div>
-                    <MonthlyOverview monthData={selectedMonth} />
-                </div>
 
-                {/* Day Selector and Entries */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div className="md:col-span-5">
-                        <div className="h-full flex flex-col">
-                            <div className="flex-1">
-                                <DaySelector
-                                    days={daysArray}
-                                    selectedDayIndex={selectedDayIndex}
-                                    onSelectDay={setSelectedDayIndex}
-                                />
+                        {/* Year Selector */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Year</label>
+                            <Select
+                                value={selectedYearIndex.toString()}
+                                onValueChange={(value: string) => {
+                                    const index = parseInt(value);
+                                    setSelectedYearIndex(index);
+                                    setSelectedMonthIndex(0);
+                                    setSelectedDayIndex(0);
+                                }}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select Year">
+                                        {yearlyData[selectedYearIndex]?.year}
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {yearlyData.map((year, index) => (
+                                        <SelectItem
+                                            key={year.year}
+                                            value={index.toString()}
+                                        >
+                                            {year.year}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Month Selector - Vertical List */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">
+                                    Month
+                                </label>
+                            </div>
+                            <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                                {selectedYear.months.map((month, index) => (
+                                    <button
+                                        key={month.monthKey}
+                                        onClick={() => {
+                                            setSelectedMonthIndex(index);
+                                            setSelectedDayIndex(0);
+                                        }}
+                                        className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+                                            selectedMonthIndex === index
+                                                ? "bg-primary text-primary-foreground"
+                                                : "hover:bg-muted"
+                                        }`}
+                                    >
+                                        {month.month}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                    </div>
 
-                    <div className="md:col-span-7">
-                        {selectedDay && <DailyEntries dayData={selectedDay} />}
+                        {/* Refresh Button - More Intuitive */}
+                        <Button
+                            variant="outline"
+                            className="w-full flex items-center justify-center gap-2"
+                            onClick={handleRefresh}
+                            disabled={isRefreshing}
+                        >
+                            <RefreshCw
+                                className={`h-4 w-4 ${
+                                    isRefreshing ? "animate-spin" : ""
+                                }`}
+                            />
+                            <span>
+                                {isRefreshing
+                                    ? "Refreshing..."
+                                    : "Refresh Data"}
+                            </span>
+                        </Button>
                     </div>
                 </div>
 
-                {/* Yearly Overview */}
-                <div>
-                    <h2 className="text-xl font-semibold mb-4">
-                        Yearly Overview
-                    </h2>
-                    <YearlyOverview yearData={selectedYear} />
+                {/* Main content area */}
+                <div className="flex-1 max-w-4xl space-y-6">
+                    {/* Monthly Overview Card */}
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <div>
+                                <CardTitle>Attendance Overview</CardTitle>
+                                <CardDescription>
+                                    View your attendance hours
+                                </CardDescription>
+                            </div>
+                            <div className="text-sm font-medium">
+                                Total:{" "}
+                                {selectedMonth.totalMergedHours.toFixed(1)}{" "}
+                                hours
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <MonthlyOverview monthData={selectedMonth} />
+                        </CardContent>
+                    </Card>
+
+                    {/* Day Selector and Entries */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-5">
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardTitle>Daily View</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <DaySelector
+                                        days={daysArray}
+                                        selectedDayIndex={selectedDayIndex}
+                                        onSelectDay={setSelectedDayIndex}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <div className="md:col-span-7">
+                            {selectedDay && (
+                                <Card>
+                                    <CardHeader className="pb-2">
+                                        <CardTitle>Daily Entries</CardTitle>
+                                        <CardDescription>
+                                            {format(
+                                                parseISO(selectedDay.date),
+                                                "EEEE, MMMM d, yyyy"
+                                            )}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <DailyEntries dayData={selectedDay} />
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Yearly Overview */}
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle>Yearly Overview</CardTitle>
+                            <CardDescription>
+                                {yearlyData[selectedYearIndex]?.year} attendance
+                                summary
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <YearlyOverview yearData={selectedYear} />
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

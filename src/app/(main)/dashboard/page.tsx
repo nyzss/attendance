@@ -7,9 +7,12 @@ import { Dashboard } from "@/components/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
     const [sessionToken] = useCookieState("sessionToken");
+    const router = useRouter();
 
     const { data, isPending, isError } = useQuery({
         queryKey: ["attendance"],
@@ -48,6 +51,14 @@ export default function DashboardPage() {
                             session token or try again later.
                         </AlertDescription>
                     </Alert>
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => router.push("/")}
+                            className="mt-4"
+                        >
+                            Go Back to Home
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
@@ -63,6 +74,9 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground">
                         No attendance records were found for your account.
                     </p>
+                    <Button onClick={() => router.push("/")} className="mt-2">
+                        Go Back to Home
+                    </Button>
                 </div>
             </div>
         );
