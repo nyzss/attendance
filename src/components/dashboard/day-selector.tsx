@@ -66,12 +66,12 @@ export function DaySelector({
     };
 
     return (
-        <div className="rounded-lg border bg-card p-4">
-            <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="rounded-lg border bg-card p-4 h-full">
+            <div className="grid grid-cols-7 gap-1 mb-3">
                 {dayNames.map((day) => (
                     <div
                         key={day}
-                        className="text-center text-xs font-medium text-muted-foreground"
+                        className="text-center text-sm font-medium text-muted-foreground"
                     >
                         {day}
                     </div>
@@ -81,7 +81,7 @@ export function DaySelector({
             <div className="grid grid-cols-7 gap-1">
                 {/* Add empty cells for days before the first day of the month */}
                 {Array.from({ length: daysInMonth[0].getDay() }).map((_, i) => (
-                    <div key={`empty-start-${i}`} className="h-10" />
+                    <div key={`empty-start-${i}`} className="h-12" />
                 ))}
 
                 {/* Render all days in the month */}
@@ -96,7 +96,7 @@ export function DaySelector({
                         <button
                             key={dateStr}
                             className={cn(
-                                "h-10 w-full rounded-md flex items-center justify-center relative",
+                                "h-12 w-full rounded-md flex items-center justify-center relative",
                                 isSelected &&
                                     "bg-primary text-primary-foreground",
                                 !isSelected &&
@@ -107,9 +107,14 @@ export function DaySelector({
                             onClick={() => dayData && handleSelectDay(date)}
                             disabled={!dayData}
                         >
-                            <span>{date.getDate()}</span>
+                            <span className="text-md">{date.getDate()}</span>
                             {hasHours && !isSelected && (
-                                <span className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
+                                <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-primary" />
+                            )}
+                            {hasHours && (
+                                <span className="absolute top-1 right-1 text-[10px] font-medium">
+                                    {Math.round(dayData.hours)}h
+                                </span>
                             )}
                         </button>
                     );
@@ -119,7 +124,7 @@ export function DaySelector({
                 {Array.from({
                     length: 6 - daysInMonth[daysInMonth.length - 1].getDay(),
                 }).map((_, i) => (
-                    <div key={`empty-end-${i}`} className="h-10" />
+                    <div key={`empty-end-${i}`} className="h-12" />
                 ))}
             </div>
         </div>

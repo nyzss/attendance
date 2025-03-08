@@ -6,10 +6,8 @@ import { processAttendanceData } from "@/lib/dashboard";
 import { YearlyOverview } from "./yearly-overview";
 import { MonthlyOverview } from "./monthly-overview";
 import { DailyEntries } from "./daily-entries";
-import { YearSelector } from "./year-selector";
 import { MonthSelector } from "./month-selector";
 import { DaySelector } from "./day-selector";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Select,
     SelectContent,
@@ -28,7 +26,6 @@ export function Dashboard({ data }: DashboardProps) {
     const [selectedYearIndex, setSelectedYearIndex] = useState(0);
     const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-    const [activeTab, setActiveTab] = useState("yearly");
 
     // If no data, show a message
     if (yearlyData.length === 0) {
@@ -54,60 +51,45 @@ export function Dashboard({ data }: DashboardProps) {
     return (
         <div className="max-w-6xl mx-auto space-y-6">
             <div className="grid gap-2">
-                <h1 className="text-2xl font-bold">Attendance Dashboard</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Attendance Dashboard</h1>
+
+                    {/* Year Selector as a dropdown */}
+                    <Select
+                        value={selectedYearIndex.toString()}
+                        onValueChange={(value: string) => {
+                            const index = parseInt(value);
+                            setSelectedYearIndex(index);
+                            setSelectedMonthIndex(0);
+                            setSelectedDayIndex(0);
+                        }}
+                    >
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Select Year">
+                                {yearlyData[selectedYearIndex]?.year}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {yearlyData.map((year, index) => (
+                                <SelectItem
+                                    key={year.year}
+                                    value={index.toString()}
+                                >
+                                    {year.year}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <p className="text-muted-foreground">
                     View your attendance hours and entries
                 </p>
             </div>
 
-            {/* Year Selector as a dropdown */}
-            <div className="flex justify-end mb-2">
-                <Select
-                    value={selectedYearIndex.toString()}
-                    onValueChange={(value: string) => {
-                        const index = parseInt(value);
-                        setSelectedYearIndex(index);
-                        setSelectedMonthIndex(0);
-                        setSelectedDayIndex(0);
-                    }}
-                >
-                    <SelectTrigger className="w-[120px]">
-                        <SelectValue placeholder="Select Year">
-                            {yearlyData[selectedYearIndex]?.year}
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {yearlyData.map((year, index) => (
-                            <SelectItem
-                                key={year.year}
-                                value={index.toString()}
-                            >
-                                {year.year}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
-            {/* Tabs for different views */}
-            <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-            >
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="yearly">Yearly Overview</TabsTrigger>
-                    <TabsTrigger value="monthly">Monthly View</TabsTrigger>
-                    <TabsTrigger value="daily">Daily Details</TabsTrigger>
-                </TabsList>
-
-                {/* Yearly Overview Tab */}
-                <TabsContent value="yearly" className="mt-4 space-y-4">
-                    <YearlyOverview yearData={selectedYear} />
-                </TabsContent>
-
-                {/* Monthly View Tab */}
-                <TabsContent value="monthly" className="mt-4 space-y-4">
+            {/* Unified Dashboard View */}
+            <div className="space-y-6">
+                {/* Month Selector and Overview */}
+                <div className="space-y-4">
                     <MonthSelector
                         months={selectedYear.months}
                         selectedMonthIndex={selectedMonthIndex}
@@ -117,21 +99,13 @@ export function Dashboard({ data }: DashboardProps) {
                         }}
                     />
                     <MonthlyOverview monthData={selectedMonth} />
-                </TabsContent>
+                </div>
 
-                {/* Daily Details Tab */}
-                <TabsContent value="daily" className="mt-4 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-1">
-                            <MonthSelector
-                                months={selectedYear.months}
-                                selectedMonthIndex={selectedMonthIndex}
-                                onSelectMonth={(index) => {
-                                    setSelectedMonthIndex(index);
-                                    setSelectedDayIndex(0);
-                                }}
-                            />
-                            <div className="mt-4">
+                {/* Day Selector and Entries */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div className="md:col-span-5">
+                        <div className="h-full flex flex-col">
+                            <div className="flex-1">
                                 <DaySelector
                                     days={daysArray}
                                     selectedDayIndex={selectedDayIndex}
@@ -139,15 +113,21 @@ export function Dashboard({ data }: DashboardProps) {
                                 />
                             </div>
                         </div>
-
-                        <div className="md:col-span-2">
-                            {selectedDay && (
-                                <DailyEntries dayData={selectedDay} />
-                            )}
-                        </div>
                     </div>
-                </TabsContent>
-            </Tabs>
+
+                    <div className="md:col-span-7">
+                        {selectedDay && <DailyEntries dayData={selectedDay} />}
+                    </div>
+                </div>
+
+                {/* Yearly Overview */}
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">
+                        Yearly Overview
+                    </h2>
+                    <YearlyOverview yearData={selectedYear} />
+                </div>
+            </div>
         </div>
     );
 }
