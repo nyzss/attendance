@@ -1,17 +1,13 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function Layout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("sessionToken")?.value;
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-    if (!sessionToken) {
-        redirect("/");
-    }
+const queryClient = new QueryClient();
 
-    return <div>{children}</div>;
+export default function Layout({ children }: { children: React.ReactNode }) {
+    return (
+        <QueryClientProvider client={queryClient}>
+            {children}
+        </QueryClientProvider>
+    );
 }
