@@ -2,14 +2,6 @@
 
 import React from "react";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardFooter,
-} from "@/components/ui/card";
-import {
     YearlyAttendance,
     createYearlyChartData,
     formatDuration,
@@ -82,83 +74,79 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
     );
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <div>
-                    <CardTitle className="flex items-center gap-2">
-                        <CalendarDays className="h-5 w-5" />
+        <div className="w-full">
+            <div className="mb-4">
+                <div className="flex items-center gap-2">
+                    <CalendarDays className="h-5 w-5" />
+                    <h3 className="text-lg font-medium">
                         {yearData.year} Monthly Breakdown
-                    </CardTitle>
-                    <CardDescription>
-                        Total hours: {formatDuration(yearData.totalMergedHours)}{" "}
-                        vs Goal: {formatDuration(totalGoalHours)} (
-                        {formatDifference(totalDifference)})
-                    </CardDescription>
+                    </h3>
                 </div>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer
-                    config={chartConfig}
-                    className="aspect-auto h-[300px] w-full"
+                <p className="text-sm text-muted-foreground mt-1">
+                    Total hours: {formatDuration(yearData.totalMergedHours)} vs
+                    Goal: {formatDuration(totalGoalHours)} (
+                    {formatDifference(totalDifference)})
+                </p>
+            </div>
+
+            <ChartContainer
+                config={chartConfig}
+                className="aspect-auto h-[300px] w-full"
+            >
+                <BarChart
+                    accessibilityLayer
+                    data={chartData}
+                    margin={{
+                        top: 20,
+                        right: 12,
+                        left: 12,
+                        bottom: 10,
+                    }}
                 >
-                    <BarChart
-                        accessibilityLayer
-                        data={chartData}
-                        margin={{
-                            top: 20,
-                            right: 12,
-                            left: 12,
-                            bottom: 10,
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) =>
+                            value.split(" ")[0].slice(0, 3)
+                        }
+                        tickMargin={8}
+                    />
+                    <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${Math.round(value)}h`}
+                        domain={[0, "auto"]}
+                    />
+                    <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent />}
+                    />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <ReferenceLine
+                        y={MONTHLY_GOAL}
+                        stroke="rgba(255, 0, 0, 0.5)"
+                        strokeDasharray="3 3"
+                        label={{
+                            value: `${MONTHLY_GOAL}h Goal`,
+                            position: "right",
                         }}
-                    >
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                            dataKey="month"
-                            tickLine={false}
-                            axisLine={false}
-                            tickFormatter={(value) =>
-                                value.split(" ")[0].slice(0, 3)
-                            }
-                            tickMargin={8}
-                        />
-                        <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tickFormatter={(value) => `${Math.round(value)}h`}
-                            domain={[0, "auto"]}
-                        />
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent />}
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                        <ReferenceLine
-                            y={MONTHLY_GOAL}
-                            stroke="rgba(255, 0, 0, 0.5)"
-                            strokeDasharray="3 3"
-                            label={{
-                                value: `${MONTHLY_GOAL}h Goal`,
-                                position: "right",
-                            }}
-                        />
-                        <Bar
+                    />
+                    <Bar dataKey="hours" fill="var(--color-hours)" radius={4}>
+                        <LabelList
                             dataKey="hours"
-                            fill="var(--color-hours)"
-                            radius={4}
-                        >
-                            <LabelList
-                                dataKey="hours"
-                                position="top"
-                                formatter={(value: number) => Math.round(value)}
-                                className="fill-foreground"
-                                fontSize={12}
-                            />
-                        </Bar>
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-            <CardFooter className="flex-col items-start gap-2 text-sm">
-                <div className="flex gap-2 font-medium leading-none">
+                            position="top"
+                            formatter={(value: number) => Math.round(value)}
+                            className="fill-foreground"
+                            fontSize={12}
+                        />
+                    </Bar>
+                </BarChart>
+            </ChartContainer>
+
+            <div className="flex flex-col mt-4 gap-2 text-sm">
+                <div className="flex gap-2 font-medium">
                     {goalPercentage >= 100
                         ? "Yearly goal achieved!"
                         : `${Math.round(goalPercentage)}% of yearly goal`}
@@ -166,10 +154,10 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                         <TrendingUp className="h-4 w-4" />
                     )}
                 </div>
-                <div className="leading-none text-muted-foreground">
+                <div className="text-muted-foreground">
                     Showing monthly attendance for {yearData.year}
                 </div>
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
     );
 }

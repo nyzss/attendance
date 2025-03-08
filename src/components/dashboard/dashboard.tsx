@@ -245,7 +245,7 @@ export function Dashboard({ data }: DashboardProps) {
                     {/* Day Selector and Entries */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                         <div className="md:col-span-5">
-                            <Card>
+                            <Card className="h-full">
                                 <CardHeader className="pb-2">
                                     <CardTitle>Daily View</CardTitle>
                                 </CardHeader>
@@ -261,7 +261,7 @@ export function Dashboard({ data }: DashboardProps) {
 
                         <div className="md:col-span-7">
                             {selectedDay && (
-                                <Card>
+                                <Card className="h-full">
                                     <CardHeader className="pb-2">
                                         <CardTitle>Daily Entries</CardTitle>
                                         <CardDescription>

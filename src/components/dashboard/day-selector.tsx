@@ -65,7 +65,7 @@ export function DaySelector({
     };
 
     return (
-        <div className="rounded-lg border bg-card p-4 h-full">
+        <div className="h-full">
             <div className="grid grid-cols-7 gap-1 mb-3">
                 {dayNames.map((day) => (
                     <div

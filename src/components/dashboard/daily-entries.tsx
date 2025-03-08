@@ -66,192 +66,180 @@ export function DailyEntries({ dayData }: DailyEntriesProps) {
     };
 
     return (
-        <Card className="w-full h-full">
-            <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <CalendarIcon className="h-5 w-5" />
-                            {formattedDate}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1">
-                            <Clock className="h-4 w-4" />
-                            Total: {formatDuration(dayData.totalMergedHours)}
-                        </CardDescription>
+        <div className="w-full h-full">
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-5 w-5" />
+                        <h3 className="text-lg font-medium">{formattedDate}</h3>
                     </div>
-                    {isWeekday ? (
-                        <Badge variant={isAboveGoal ? "default" : "secondary"}>
-                            {isAboveGoal
-                                ? "Goal Reached"
-                                : `${formatDuration(
-                                      hoursToGoal
-                                  )} to reach ${DAILY_GOAL}h goal`}
-                        </Badge>
-                    ) : (
-                        <Badge variant="outline">Weekend - No Goal</Badge>
-                    )}
+                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        Total: {formatDuration(dayData.totalMergedHours)}
+                    </div>
                 </div>
-            </CardHeader>
-            <CardContent>
-                <Tabs defaultValue="merged">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="merged">Merged Entries</TabsTrigger>
-                        <TabsTrigger value="raw">Raw Entries</TabsTrigger>
-                    </TabsList>
+                {isWeekday ? (
+                    <Badge variant={isAboveGoal ? "default" : "secondary"}>
+                        {isAboveGoal
+                            ? "Goal Reached"
+                            : `${formatDuration(
+                                  hoursToGoal
+                              )} to reach ${DAILY_GOAL}h goal`}
+                    </Badge>
+                ) : (
+                    <Badge variant="outline">Weekend - No Goal</Badge>
+                )}
+            </div>
+            <Tabs defaultValue="merged">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="merged">Merged Entries</TabsTrigger>
+                    <TabsTrigger value="raw">Raw Entries</TabsTrigger>
+                </TabsList>
 
-                    <TabsContent value="merged" className="mt-2">
-                        <div className="rounded-md border">
+                <TabsContent value="merged" className="mt-2">
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[80px]">
+                                        Start
+                                    </TableHead>
+                                    <TableHead className="w-[80px]">
+                                        End
+                                    </TableHead>
+                                    <TableHead>Sources</TableHead>
+                                    <TableHead className="w-[100px] text-right">
+                                        Duration
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                        </Table>
+                        <ScrollArea className="h-[250px]">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[80px]">
-                                            Start
-                                        </TableHead>
-                                        <TableHead className="w-[80px]">
-                                            End
-                                        </TableHead>
-                                        <TableHead>Sources</TableHead>
-                                        <TableHead className="w-[100px] text-right">
-                                            Duration
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                            </Table>
-                            <ScrollArea className="h-[250px]">
-                                <Table>
-                                    <TableBody>
-                                        {dayData.mergedEntries.length > 0 ? (
-                                            dayData.mergedEntries.map(
-                                                (entry, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell className="w-[80px]">
-                                                            {format(
-                                                                entry.begin,
-                                                                "HH:mm"
+                                <TableBody>
+                                    {dayData.mergedEntries.length > 0 ? (
+                                        dayData.mergedEntries.map(
+                                            (entry, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell className="w-[80px]">
+                                                        {format(
+                                                            entry.begin,
+                                                            "HH:mm"
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="w-[80px]">
+                                                        {format(
+                                                            entry.end,
+                                                            "HH:mm"
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {getMergedEntrySources(
+                                                                index
+                                                            ).map(
+                                                                (source, i) => (
+                                                                    <Badge
+                                                                        key={i}
+                                                                        variant="outline"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        {source}
+                                                                    </Badge>
+                                                                )
                                                             )}
-                                                        </TableCell>
-                                                        <TableCell className="w-[80px]">
-                                                            {format(
-                                                                entry.end,
-                                                                "HH:mm"
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex flex-wrap gap-1">
-                                                                {getMergedEntrySources(
-                                                                    index
-                                                                ).map(
-                                                                    (
-                                                                        source,
-                                                                        i
-                                                                    ) => (
-                                                                        <Badge
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            variant="outline"
-                                                                            className="text-xs"
-                                                                        >
-                                                                            {
-                                                                                source
-                                                                            }
-                                                                        </Badge>
-                                                                    )
-                                                                )}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="w-[100px] text-right">
-                                                            {formatDuration(
-                                                                entry.durationHours
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="w-[100px] text-right">
+                                                        {formatDuration(
+                                                            entry.durationHours
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
                                             )
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={4}
-                                                    className="text-center text-muted-foreground py-4"
-                                                >
-                                                    No merged entries for this
-                                                    day
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </div>
-                    </TabsContent>
+                                        )
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={4}
+                                                className="text-center text-muted-foreground py-4"
+                                            >
+                                                No merged entries for this day
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </ScrollArea>
+                    </div>
+                </TabsContent>
 
-                    <TabsContent value="raw" className="mt-2">
-                        <div className="rounded-md border">
+                <TabsContent value="raw" className="mt-2">
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[80px]">
+                                        Start
+                                    </TableHead>
+                                    <TableHead className="w-[80px]">
+                                        End
+                                    </TableHead>
+                                    <TableHead>Source</TableHead>
+                                    <TableHead className="w-[100px] text-right">
+                                        Duration
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                        </Table>
+                        <ScrollArea className="h-[250px]">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[80px]">
-                                            Start
-                                        </TableHead>
-                                        <TableHead className="w-[80px]">
-                                            End
-                                        </TableHead>
-                                        <TableHead>Source</TableHead>
-                                        <TableHead className="w-[100px] text-right">
-                                            Duration
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                            </Table>
-                            <ScrollArea className="h-[250px]">
-                                <Table>
-                                    <TableBody>
-                                        {dayData.rawEntries.length > 0 ? (
-                                            dayData.rawEntries.map(
-                                                (entry, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell className="w-[80px]">
-                                                            {format(
-                                                                entry.begin,
-                                                                "HH:mm"
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="w-[80px]">
-                                                            {format(
-                                                                entry.end,
-                                                                "HH:mm"
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="outline">
-                                                                {entry.source}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="w-[100px] text-right">
-                                                            {formatDuration(
-                                                                entry.durationHours
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
+                                <TableBody>
+                                    {dayData.rawEntries.length > 0 ? (
+                                        dayData.rawEntries.map(
+                                            (entry, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell className="w-[80px]">
+                                                        {format(
+                                                            entry.begin,
+                                                            "HH:mm"
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="w-[80px]">
+                                                        {format(
+                                                            entry.end,
+                                                            "HH:mm"
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline">
+                                                            {entry.source}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="w-[100px] text-right">
+                                                        {formatDuration(
+                                                            entry.durationHours
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
                                             )
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={4}
-                                                    className="text-center text-muted-foreground py-4"
-                                                >
-                                                    No raw entries for this day
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </div>
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
-        </Card>
+                                        )
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={4}
+                                                className="text-center text-muted-foreground py-4"
+                                            >
+                                                No raw entries for this day
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </ScrollArea>
+                    </div>
+                </TabsContent>
+            </Tabs>
+        </div>
     );
 }

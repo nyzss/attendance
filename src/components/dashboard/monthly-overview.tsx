@@ -2,14 +2,6 @@
 
 import React from "react";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardFooter,
-} from "@/components/ui/card";
-import {
     MonthlyAttendance,
     mapToChartData,
     formatDuration,
@@ -32,7 +24,7 @@ import {
     ChartLegend,
     ChartLegendContent,
 } from "@/components/ui/chart";
-import { CalendarIcon, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 // Monthly goal in hours (7 hours per day, 5 days a week, ~4 weeks per month)
 const DAILY_GOAL = 7;
@@ -76,16 +68,14 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Radial Goal Chart */}
-            <Card className="w-full md:col-span-1">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-center text-lg">
-                        Monthly Goal
-                    </CardTitle>
-                    <CardDescription className="text-center">
+            <div className="w-full md:col-span-1">
+                <div className="text-center mb-2">
+                    <h3 className="text-lg font-medium">Monthly Goal</h3>
+                    <p className="text-sm text-muted-foreground">
                         {Math.round(progressPercentage)}% Complete
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center justify-center pt-0">
+                    </p>
+                </div>
+                <div className="flex flex-col items-center justify-center">
                     <div className="h-[180px] w-[180px] relative">
                         <RadialBarChart
                             innerRadius="70%"
@@ -130,109 +120,92 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                             days/week)
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Area Chart */}
-            <Card className="w-full md:col-span-3">
-                <CardHeader className="pb-2">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <CalendarIcon className="h-5 w-5" />
-                            {monthData.month}
-                        </CardTitle>
-                        <CardDescription>
-                            Daily attendance hours
-                        </CardDescription>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <ChartContainer
-                        config={chartConfig}
-                        className="aspect-auto h-[250px] w-full"
+            <div className="w-full md:col-span-3">
+                <ChartContainer
+                    config={chartConfig}
+                    className="aspect-auto h-[250px] w-full"
+                >
+                    <AreaChart
+                        data={chartData}
+                        margin={{
+                            top: 20,
+                            right: 12,
+                            left: 12,
+                            bottom: 10,
+                        }}
                     >
-                        <AreaChart
-                            data={chartData}
-                            margin={{
-                                top: 20,
-                                right: 12,
-                                left: 12,
-                                bottom: 10,
+                        <defs>
+                            <linearGradient
+                                id="fillHours"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
+                            >
+                                <stop
+                                    offset="5%"
+                                    stopColor="var(--color-hours)"
+                                    stopOpacity={0.9}
+                                />
+                                <stop
+                                    offset="95%"
+                                    stopColor="var(--color-hours)"
+                                    stopOpacity={0.3}
+                                />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                            dataKey="formattedDate"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            minTickGap={10}
+                        />
+                        <YAxis
+                            tickLine={false}
+                            axisLine={false}
+                            tickFormatter={(value) => `${Math.round(value)}h`}
+                            domain={[0, "auto"]}
+                        />
+                        <ChartTooltip
+                            cursor={false}
+                            content={
+                                <ChartTooltipContent
+                                    labelFormatter={(value) => {
+                                        return `Date: ${value}`;
+                                    }}
+                                    indicator="dot"
+                                />
+                            }
+                        />
+                        <ReferenceLine
+                            y={DAILY_GOAL}
+                            stroke="rgba(255, 0, 0, 0.5)"
+                            strokeDasharray="3 3"
+                            label={{
+                                value: "Daily Goal (7h)",
+                                position: "insideTopRight",
                             }}
-                        >
-                            <defs>
-                                <linearGradient
-                                    id="fillHours"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor="var(--color-hours)"
-                                        stopOpacity={0.9}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor="var(--color-hours)"
-                                        stopOpacity={0.3}
-                                    />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="formattedDate"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                minTickGap={10}
-                            />
-                            <YAxis
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(value) =>
-                                    `${Math.round(value)}h`
-                                }
-                                domain={[0, "auto"]}
-                            />
-                            <ChartTooltip
-                                cursor={false}
-                                content={
-                                    <ChartTooltipContent
-                                        labelFormatter={(value) => {
-                                            return `Date: ${value}`;
-                                        }}
-                                        indicator="dot"
-                                    />
-                                }
-                            />
-                            <ReferenceLine
-                                y={DAILY_GOAL}
-                                stroke="rgba(255, 0, 0, 0.5)"
-                                strokeDasharray="3 3"
-                                label={{
-                                    value: "Daily Goal (7h)",
-                                    position: "insideTopRight",
-                                }}
-                            />
-                            <Area
-                                dataKey="hours"
-                                type="natural"
-                                fill="url(#fillHours)"
-                                stroke="var(--color-hours)"
-                                strokeWidth={2}
-                            />
-                            <ChartLegend content={<ChartLegendContent />} />
-                        </AreaChart>
-                    </ChartContainer>
-                </CardContent>
-                <CardFooter className="flex-col items-start gap-2 text-sm">
-                    <div className="leading-none text-muted-foreground">
-                        Showing daily attendance for {monthData.month}
-                    </div>
-                </CardFooter>
-            </Card>
+                        />
+                        <Area
+                            dataKey="hours"
+                            type="natural"
+                            fill="url(#fillHours)"
+                            stroke="var(--color-hours)"
+                            strokeWidth={2}
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                    </AreaChart>
+                </ChartContainer>
+                <div className="text-sm text-muted-foreground mt-2">
+                    Showing daily attendance for {monthData.month}
+                </div>
+            </div>
         </div>
     );
 }
