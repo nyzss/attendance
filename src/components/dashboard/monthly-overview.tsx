@@ -176,9 +176,18 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                             cursor={false}
                             content={
                                 <ChartTooltipContent
+                                    className="w-[150px]"
                                     labelFormatter={(value) => {
                                         return `Date: ${value}`;
                                     }}
+                                    formatter={(value) => [
+                                        <span className="font-bold">
+                                            Hours:{" "}
+                                        </span>,
+                                        <span>
+                                            {Math.round(Number(value))}h
+                                        </span>,
+                                    ]}
                                     indicator="dot"
                                 />
                             }

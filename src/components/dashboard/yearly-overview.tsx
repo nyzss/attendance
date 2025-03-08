@@ -121,7 +121,17 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                     />
                     <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent />}
+                        content={
+                            <ChartTooltipContent
+                                className="w-[180px]"
+                                formatter={(value) => [
+                                    <span className="font-bold">
+                                        Actual Hours:{" "}
+                                    </span>,
+                                    `${Math.round(Number(value))}h`,
+                                ]}
+                            />
+                        }
                     />
                     <ChartLegend content={<ChartLegendContent />} />
                     <ReferenceLine
