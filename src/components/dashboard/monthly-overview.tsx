@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
+    CardFooter,
 } from "@/components/ui/card";
 import {
     MonthlyAttendance,
@@ -19,13 +21,17 @@ import {
     XAxis,
     YAxis,
     ReferenceLine,
+    RadialBar,
+    RadialBarChart,
+    PolarAngleAxis,
 } from "recharts";
 import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
+    ChartLegend,
+    ChartLegendContent,
 } from "@/components/ui/chart";
-import { Progress } from "@/components/ui/progress";
 import { CalendarIcon, Clock } from "lucide-react";
 
 // Monthly goal in hours (7 hours per day, 5 days a week, ~4 weeks per month)
@@ -53,58 +59,110 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
         (monthData.totalMergedHours / MONTHLY_GOAL) * 100
     );
 
-    // Determine status color based on progress
+    // Data for radial chart
+    const radialData = [
+        {
+            name: "Goal",
+            value: progressPercentage,
+            fill:
+                progressPercentage >= 100
+                    ? "hsl(var(--success))"
+                    : progressPercentage >= 75
+                    ? "hsl(var(--warning))"
+                    : "hsl(var(--destructive))",
+        },
+    ];
 
     return (
-        <Card className="w-full">
-            <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Radial Goal Chart */}
+            <Card className="w-full md:col-span-1">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-center text-lg">
+                        Monthly Goal
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                        {Math.round(progressPercentage)}% Complete
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center pt-0">
+                    <div className="h-[180px] w-[180px] relative">
+                        <RadialBarChart
+                            innerRadius="70%"
+                            outerRadius="100%"
+                            data={radialData}
+                            startAngle={90}
+                            endAngle={-270}
+                            width={180}
+                            height={180}
+                        >
+                            <PolarAngleAxis
+                                type="number"
+                                domain={[0, 100]}
+                                angleAxisId={0}
+                                tick={false}
+                            />
+                            <RadialBar
+                                background
+                                dataKey="value"
+                                cornerRadius={30}
+                            />
+                            <text
+                                x="50%"
+                                y="50%"
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                                className="text-2xl font-bold"
+                            >
+                                {Math.round(progressPercentage)}%
+                            </text>
+                        </RadialBarChart>
+                    </div>
+                    <div className="mt-2 text-center space-y-1">
+                        <div className="flex items-center justify-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>
+                                {formatDuration(monthData.totalMergedHours)}
+                            </span>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            Goal: {MONTHLY_GOAL}h ({DAILY_GOAL}h/day, 5
+                            days/week)
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Area Chart */}
+            <Card className="w-full md:col-span-3">
+                <CardHeader className="pb-2">
                     <div>
                         <CardTitle className="flex items-center gap-2">
                             <CalendarIcon className="h-5 w-5" />
                             {monthData.month}
                         </CardTitle>
                         <CardDescription>
-                            Total hours:{" "}
-                            {formatDuration(monthData.totalMergedHours)}{" "}
-                            (merged) / {formatDuration(monthData.totalRawHours)}{" "}
-                            (raw)
+                            Daily attendance hours
                         </CardDescription>
                     </div>
-                    <div className="text-right">
-                        <div className="text-sm font-medium">Monthly Goal</div>
-                        <div className={`text-3xl font-bold`}>
-                            {Math.round(progressPercentage)}%
-                        </div>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                <span>
-                                    {formatDuration(monthData.totalMergedHours)}
-                                </span>
-                            </div>
-                            <div>
-                                Goal: {MONTHLY_GOAL}h ({DAILY_GOAL}h/day, 5
-                                days/week)
-                            </div>
-                        </div>
-                        <Progress value={progressPercentage} className="h-2" />
-                    </div>
-
+                </CardHeader>
+                <CardContent>
                     <ChartContainer
                         config={chartConfig}
-                        className="h-[250px] w-full"
+                        className="aspect-auto h-[250px] w-full"
                     >
-                        <AreaChart accessibilityLayer data={chartData}>
+                        <AreaChart
+                            data={chartData}
+                            margin={{
+                                top: 20,
+                                right: 12,
+                                left: 12,
+                                bottom: 10,
+                            }}
+                        >
                             <defs>
                                 <linearGradient
-                                    id="colorHours"
+                                    id="fillHours"
                                     x1="0"
                                     y1="0"
                                     x2="0"
@@ -113,23 +171,22 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                                     <stop
                                         offset="5%"
                                         stopColor="var(--color-hours)"
-                                        stopOpacity={0.8}
+                                        stopOpacity={0.9}
                                     />
                                     <stop
                                         offset="95%"
                                         stopColor="var(--color-hours)"
-                                        stopOpacity={0.1}
+                                        stopOpacity={0.3}
                                     />
                                 </linearGradient>
                             </defs>
-                            <CartesianGrid
-                                vertical={false}
-                                strokeDasharray="3 3"
-                            />
+                            <CartesianGrid vertical={false} />
                             <XAxis
                                 dataKey="formattedDate"
                                 tickLine={false}
                                 axisLine={false}
+                                tickMargin={8}
+                                minTickGap={10}
                             />
                             <YAxis
                                 tickLine={false}
@@ -137,8 +194,19 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                                 tickFormatter={(value) =>
                                     `${Math.round(value)}h`
                                 }
+                                domain={[0, "auto"]}
                             />
-                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <ChartTooltip
+                                cursor={false}
+                                content={
+                                    <ChartTooltipContent
+                                        labelFormatter={(value) => {
+                                            return `Date: ${value}`;
+                                        }}
+                                        indicator="dot"
+                                    />
+                                }
+                            />
                             <ReferenceLine
                                 y={DAILY_GOAL}
                                 stroke="rgba(255, 0, 0, 0.5)"
@@ -149,16 +217,22 @@ export function MonthlyOverview({ monthData }: MonthlyOverviewProps) {
                                 }}
                             />
                             <Area
-                                type="monotone"
                                 dataKey="hours"
+                                type="natural"
+                                fill="url(#fillHours)"
                                 stroke="var(--color-hours)"
-                                fillOpacity={1}
-                                fill="url(#colorHours)"
+                                strokeWidth={2}
                             />
+                            <ChartLegend content={<ChartLegendContent />} />
                         </AreaChart>
                     </ChartContainer>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+                <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="leading-none text-muted-foreground">
+                        Showing daily attendance for {monthData.month}
+                    </div>
+                </CardFooter>
+            </Card>
+        </div>
     );
 }

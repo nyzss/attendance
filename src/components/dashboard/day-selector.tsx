@@ -111,7 +111,7 @@ export function DaySelector({
                                 <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-primary" />
                             )}
                             {hasHours && (
-                                <span className="absolute top-1 right-1 text-[10px] font-medium">
+                                <span className="absolute top-1 right-1 text-[8px] text-foreground/70">
                                     {Math.round(dayData.hours)}h
                                 </span>
                             )}

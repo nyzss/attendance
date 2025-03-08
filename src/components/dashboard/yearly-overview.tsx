@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
+    CardFooter,
 } from "@/components/ui/card";
 import {
     YearlyAttendance,
@@ -19,6 +21,7 @@ import {
     XAxis,
     YAxis,
     ReferenceLine,
+    LabelList,
 } from "recharts";
 import {
     ChartContainer,
@@ -27,7 +30,7 @@ import {
     ChartLegend,
     ChartLegendContent,
 } from "@/components/ui/chart";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, TrendingUp } from "lucide-react";
 
 // Monthly goal in hours (7 hours per day, 5 days a week, ~4 weeks per month)
 const DAILY_GOAL = 7;
@@ -72,31 +75,43 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
         return value >= 0 ? `+${formatDuration(value)}` : formatDuration(value);
     };
 
+    // Calculate percentage of goal achieved
+    const goalPercentage = Math.min(
+        100,
+        (totalActualHours / totalGoalHours) * 100
+    );
+
     return (
         <Card className="w-full">
             <CardHeader>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <CalendarDays className="h-5 w-5" />
-                            {yearData.year} Attendance Overview
-                        </CardTitle>
-                        <CardDescription>
-                            Total hours:{" "}
-                            {formatDuration(yearData.totalMergedHours)} vs Goal:{" "}
-                            {formatDuration(totalGoalHours)}(
-                            {formatDifference(totalDifference)})
-                        </CardDescription>
-                    </div>
+                <div>
+                    <CardTitle className="flex items-center gap-2">
+                        <CalendarDays className="h-5 w-5" />
+                        {yearData.year} Monthly Breakdown
+                    </CardTitle>
+                    <CardDescription>
+                        Total hours: {formatDuration(yearData.totalMergedHours)}{" "}
+                        vs Goal: {formatDuration(totalGoalHours)} (
+                        {formatDifference(totalDifference)})
+                    </CardDescription>
                 </div>
             </CardHeader>
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="h-[300px] w-full"
+                    className="aspect-auto h-[300px] w-full"
                 >
-                    <BarChart accessibilityLayer data={chartData}>
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <BarChart
+                        accessibilityLayer
+                        data={chartData}
+                        margin={{
+                            top: 20,
+                            right: 12,
+                            left: 12,
+                            bottom: 10,
+                        }}
+                    >
+                        <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="month"
                             tickLine={false}
@@ -104,13 +119,18 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                             tickFormatter={(value) =>
                                 value.split(" ")[0].slice(0, 3)
                             }
+                            tickMargin={8}
                         />
                         <YAxis
                             tickLine={false}
                             axisLine={false}
                             tickFormatter={(value) => `${Math.round(value)}h`}
+                            domain={[0, "auto"]}
                         />
-                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent />}
+                        />
                         <ChartLegend content={<ChartLegendContent />} />
                         <ReferenceLine
                             y={MONTHLY_GOAL}
@@ -125,10 +145,31 @@ export function YearlyOverview({ yearData }: YearlyOverviewProps) {
                             dataKey="hours"
                             fill="var(--color-hours)"
                             radius={4}
-                        />
+                        >
+                            <LabelList
+                                dataKey="hours"
+                                position="top"
+                                formatter={(value: number) => Math.round(value)}
+                                className="fill-foreground"
+                                fontSize={12}
+                            />
+                        </Bar>
                     </BarChart>
                 </ChartContainer>
             </CardContent>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+                <div className="flex gap-2 font-medium leading-none">
+                    {goalPercentage >= 100
+                        ? "Yearly goal achieved!"
+                        : `${Math.round(goalPercentage)}% of yearly goal`}
+                    {goalPercentage >= 100 && (
+                        <TrendingUp className="h-4 w-4" />
+                    )}
+                </div>
+                <div className="leading-none text-muted-foreground">
+                    Showing monthly attendance for {yearData.year}
+                </div>
+            </CardFooter>
         </Card>
     );
 }

@@ -62,6 +62,32 @@ export function Dashboard({ data }: DashboardProps) {
                 );
                 if (monthIndex !== -1) {
                     setSelectedMonthIndex(monthIndex);
+
+                    // Find the most recent day with data
+                    const month = year.months[monthIndex];
+                    const daysArray = Array.from(month.days.values()).sort(
+                        (a, b) => b.date.localeCompare(a.date) // Sort in descending order (most recent first)
+                    );
+
+                    if (daysArray.length > 0) {
+                        // Convert to the format used in the component
+                        const sortedDaysForDisplay = Array.from(
+                            month.days.values()
+                        ).sort(
+                            (a, b) => a.date.localeCompare(b.date) // Sort in ascending order for display
+                        );
+
+                        // Find the index of the most recent day in the display array
+                        const mostRecentDay = daysArray[0];
+                        const mostRecentDayIndex =
+                            sortedDaysForDisplay.findIndex(
+                                (day) => day.date === mostRecentDay.date
+                            );
+
+                        if (mostRecentDayIndex !== -1) {
+                            setSelectedDayIndex(mostRecentDayIndex);
+                        }
+                    }
                 }
             }
         }
@@ -135,20 +161,6 @@ export function Dashboard({ data }: DashboardProps) {
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <label className="text-sm font-medium">Month</label>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={handleRefresh}
-                                disabled={isRefreshing}
-                                title="Refresh attendance data"
-                                className="h-7 w-7"
-                            >
-                                <RefreshCw
-                                    className={`h-3.5 w-3.5 ${
-                                        isRefreshing ? "animate-spin" : ""
-                                    }`}
-                                />
-                            </Button>
                         </div>
                         <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
                             {selectedYear.months.map((month, index) => (
@@ -169,6 +181,23 @@ export function Dashboard({ data }: DashboardProps) {
                             ))}
                         </div>
                     </div>
+
+                    {/* Refresh Button - More Intuitive */}
+                    <Button
+                        variant="outline"
+                        className="w-full flex items-center justify-center gap-2"
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                    >
+                        <RefreshCw
+                            className={`h-4 w-4 ${
+                                isRefreshing ? "animate-spin" : ""
+                            }`}
+                        />
+                        <span>
+                            {isRefreshing ? "Refreshing..." : "Refresh Data"}
+                        </span>
+                    </Button>
                 </div>
             </div>
 
