@@ -38,6 +38,7 @@ export default function SessionForm() {
     const [sessionToken, setCookie] = useCookieState("sessionToken");
     const [isCheckingToken, setIsCheckingToken] = useState(false);
     const [isTokenValid, setIsTokenValid] = useState(false);
+    const [activeTab, setActiveTab] = useState("chrome");
 
     const router = useRouter();
 
@@ -229,34 +230,103 @@ export default function SessionForm() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-sm text-gray-700">
-                        <ol className="list-decimal list-inside space-y-3">
-                            <li>
-                                Go to{" "}
-                                <a
-                                    href="https://dashboard.42paris.fr"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline"
-                                >
-                                    dashboard.42paris.fr
-                                </a>{" "}
-                                and log in
-                            </li>
-                            <li>
-                                Open Chrome DevTools (right-click and select
-                                &quot;Inspect&quot; or press F12)
-                            </li>
-                            <li>Go to the &quot;Application&quot; tab</li>
-                            <li>
-                                In the left sidebar, expand &quot;Cookies&quot;
-                                and select the 42 dashboard site
-                            </li>
-                            <li>
-                                Find the cookie named &quot;session&quot; and
-                                copy its value
-                            </li>
-                            <li>Paste the value in the form on the left</li>
-                        </ol>
+                        <div className="flex space-x-1 border-b">
+                            <button
+                                className="px-4 py-2 text-sm font-medium transition-colors rounded-t-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:border-x data-[state=active]:border-t data-[state=active]:border-border data-[state=active]:-mb-px data-[state=inactive]:bg-muted/50 data-[state=inactive]:hover:bg-muted"
+                                data-state={
+                                    activeTab === "chrome"
+                                        ? "active"
+                                        : "inactive"
+                                }
+                                onClick={() => setActiveTab("chrome")}
+                            >
+                                Chrome
+                            </button>
+                            <button
+                                className="px-4 py-2 text-sm font-medium transition-colors rounded-t-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:border-x data-[state=active]:border-t data-[state=active]:border-border data-[state=active]:-mb-px data-[state=inactive]:bg-muted/50 data-[state=inactive]:hover:bg-muted"
+                                data-state={
+                                    activeTab === "firefox"
+                                        ? "active"
+                                        : "inactive"
+                                }
+                                onClick={() => setActiveTab("firefox")}
+                            >
+                                Firefox
+                            </button>
+                        </div>
+
+                        <div
+                            className={
+                                activeTab === "chrome" ? "block" : "hidden"
+                            }
+                        >
+                            <ol className="list-decimal list-inside space-y-3">
+                                <li>
+                                    Go to{" "}
+                                    <a
+                                        href="https://dashboard.42paris.fr"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        dashboard.42paris.fr
+                                    </a>{" "}
+                                    and log in
+                                </li>
+                                <li>
+                                    Open Chrome DevTools (right-click and select
+                                    &quot;Inspect&quot; or press F12)
+                                </li>
+                                <li>Go to the &quot;Application&quot; tab</li>
+                                <li>
+                                    In the left sidebar, expand
+                                    &quot;Cookies&quot; and select the 42
+                                    dashboard site
+                                </li>
+                                <li>
+                                    Find the cookie named &quot;session&quot;
+                                    and copy its value
+                                </li>
+                                <li>Paste the value in the form on the left</li>
+                            </ol>
+                        </div>
+
+                        <div
+                            className={
+                                activeTab === "firefox" ? "block" : "hidden"
+                            }
+                        >
+                            <ol className="list-decimal list-inside space-y-3">
+                                <li>
+                                    Go to{" "}
+                                    <a
+                                        href="https://dashboard.42paris.fr"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        dashboard.42paris.fr
+                                    </a>{" "}
+                                    and log in
+                                </li>
+                                <li>
+                                    Open Firefox DevTools (right-click and
+                                    select &quot;Inspect&quot; or press F12)
+                                </li>
+                                <li>Go to the &quot;Storage&quot; tab</li>
+                                <li>
+                                    In the left sidebar, expand
+                                    &quot;Cookies&quot; and select the 42
+                                    dashboard site
+                                </li>
+                                <li>
+                                    Find the cookie named &quot;session&quot;
+                                    and copy its value
+                                </li>
+                                <li>Paste the value in the form on the left</li>
+                            </ol>
+                        </div>
+
                         <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700 mt-4">
                             <p className="font-medium">
                                 Important Security Warning
