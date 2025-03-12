@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -130,93 +130,119 @@ export function Dashboard({ data }: DashboardProps) {
 
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Left sidebar with selectors */}
-                <div className="md:sticky md:top-14 md:self-start md:w-64 border rounded-lg bg-card shadow-sm">
-                    <div className="p-4 space-y-6">
-                        {/* Dashboard Title */}
-                        <div>
-                            <h2 className="text-xl font-bold mb-1">
-                                Dashboard
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
-                                View your attendance
+
+                <div className="md:w-64 md:sticky md:top-14 md:self-start">
+                    <div className="border rounded-lg bg-card shadow-sm">
+                        <div className="p-4 space-y-6">
+                            {/* Dashboard Title */}
+                            <div>
+                                <h2 className="text-xl font-bold mb-1">
+                                    Dashboard
+                                </h2>
+                                <p className="text-sm text-muted-foreground">
+                                    View your attendance
+                                </p>
+                            </div>
+
+                            {/* Year Selector */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">
+                                    Year
+                                </label>
+                                <Select
+                                    value={selectedYearIndex.toString()}
+                                    onValueChange={(value: string) => {
+                                        const index = parseInt(value);
+                                        setSelectedYearIndex(index);
+                                        setSelectedMonthIndex(0);
+                                        setSelectedDayIndex(0);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select Year">
+                                            {
+                                                yearlyData[selectedYearIndex]
+                                                    ?.year
+                                            }
+                                        </SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {yearlyData.map((year, index) => (
+                                            <SelectItem
+                                                key={year.year}
+                                                value={index.toString()}
+                                            >
+                                                {year.year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Month Selector - Vertical List */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">
+                                        Month
+                                    </label>
+                                </div>
+                                <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                                    {selectedYear.months.map((month, index) => (
+                                        <button
+                                            key={month.monthKey}
+                                            onClick={() => {
+                                                setSelectedMonthIndex(index);
+                                                setSelectedDayIndex(0);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 rounded-md text-sm ${
+                                                selectedMonthIndex === index
+                                                    ? "bg-primary text-primary-foreground"
+                                                    : "hover:bg-muted"
+                                            }`}
+                                        >
+                                            {month.month}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Refresh Button - More Intuitive */}
+                            <Button
+                                variant="outline"
+                                className="w-full flex items-center justify-center gap-2"
+                                onClick={handleRefresh}
+                                disabled={isRefreshing}
+                            >
+                                <RefreshCw
+                                    className={`h-4 w-4 ${
+                                        isRefreshing ? "animate-spin" : ""
+                                    }`}
+                                />
+                                <span>
+                                    {isRefreshing
+                                        ? "Refreshing..."
+                                        : "Refresh Data"}
+                                </span>
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="mt-4 rounded-lg border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/50 p-4">
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-20 w-20 text-yellow-600 dark:text-yellow-500" />
+                            <p className="text-sm text-yellow-600 dark:text-yellow-500">
+                                This is an unofficial tool. For accurate
+                                attendance records, please refer to the{" "}
+                                <a
+                                    href="https://dashboard.42paris.fr"
+                                    className="underline"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    official school dashboard
+                                </a>
+                                .
                             </p>
                         </div>
-
-                        {/* Year Selector */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Year</label>
-                            <Select
-                                value={selectedYearIndex.toString()}
-                                onValueChange={(value: string) => {
-                                    const index = parseInt(value);
-                                    setSelectedYearIndex(index);
-                                    setSelectedMonthIndex(0);
-                                    setSelectedDayIndex(0);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select Year">
-                                        {yearlyData[selectedYearIndex]?.year}
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {yearlyData.map((year, index) => (
-                                        <SelectItem
-                                            key={year.year}
-                                            value={index.toString()}
-                                        >
-                                            {year.year}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Month Selector - Vertical List */}
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium">
-                                    Month
-                                </label>
-                            </div>
-                            <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
-                                {selectedYear.months.map((month, index) => (
-                                    <button
-                                        key={month.monthKey}
-                                        onClick={() => {
-                                            setSelectedMonthIndex(index);
-                                            setSelectedDayIndex(0);
-                                        }}
-                                        className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                                            selectedMonthIndex === index
-                                                ? "bg-primary text-primary-foreground"
-                                                : "hover:bg-muted"
-                                        }`}
-                                    >
-                                        {month.month}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Refresh Button - More Intuitive */}
-                        <Button
-                            variant="outline"
-                            className="w-full flex items-center justify-center gap-2"
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                        >
-                            <RefreshCw
-                                className={`h-4 w-4 ${
-                                    isRefreshing ? "animate-spin" : ""
-                                }`}
-                            />
-                            <span>
-                                {isRefreshing
-                                    ? "Refreshing..."
-                                    : "Refresh Data"}
-                            </span>
-                        </Button>
                     </div>
                 </div>
 

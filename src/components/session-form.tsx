@@ -197,12 +197,12 @@ export default function SessionForm() {
                                             and you can verify how your data is
                                             handled at{" "}
                                             <a
-                                                href="https://github.com/nyzss"
+                                                href="https://github.com/nyzss/attendance"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="underline font-medium"
                                             >
-                                                github.com/nyzss
+                                                github.com/nyzss/attendance
                                             </a>
                                             .
                                         </p>
